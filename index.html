@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Đọc dữ liệu từ thẻ NFC</title>
+</head>
+<body>
+  <button onclick="startNFC()">Bắt đầu đọc thẻ NFC</button>
+  <div id="nfc-data"></div>
+
+  <script>
+    async function startNFC() {
+      if ("NDEFReader" in window) {
+        try {
+          const ndef = new NDEFReader();
+          await ndef.scan();
+          console.log("Đang chờ thẻ NFC...");
+          ndef.onreading = event => {
+            const message = event.message;
+            const records = message.records.map(record => record.data);
+            showNFCData(records);
+          };
+        } catch (error) {
+          console.error("Lỗi: " + error);
+        }
+      } else {
+        console.error("Trình duyệt không hỗ trợ Web NFC API.");
+      }
+    }
+
+    function showNFCData(data) {
+      const nfcDataDiv = document.getElementById("nfc-data");
+      nfcDataDiv.innerHTML = "";
+      data.forEach((recordData, index) => {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = "Record " + (index + 1) + ": " + recordData;
+        nfcDataDiv.appendChild(paragraph);
+      });
+    }
+  </script>
+</body>
+</html>
